@@ -11,7 +11,7 @@ import {
   SetStateAction,
 } from 'react';
 import isEqual from 'react-fast-compare';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const getItemAsync = AsyncStorage.getItem;
 const setItemAsync = AsyncStorage.setItem;
