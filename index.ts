@@ -23,11 +23,14 @@ export type Serializable =
   | string
   | null
   | SerializableArray
+  | ReadonlySerializableArray
   | SerializableMap;
+
 interface SerializableMap {
   [key: string]: Serializable;
 }
 interface SerializableArray extends Array<Serializable> {}
+interface ReadonlySerializableArray extends ReadonlyArray<Serializable> {}
 
 export type Unsubscribe = () => void;
 export type Listener<T extends Serializable> = (
