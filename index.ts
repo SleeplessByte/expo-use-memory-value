@@ -27,10 +27,11 @@ export type Serializable =
   | SerializableMap;
 
 interface SerializableMap {
-  [key: string]: Serializable;
+  [key: string]: Serializable | undefined;
 }
-interface SerializableArray extends Array<Serializable> {}
-interface ReadonlySerializableArray extends ReadonlyArray<Serializable> {}
+interface SerializableArray extends Array<Serializable | undefined> {}
+interface ReadonlySerializableArray
+  extends ReadonlyArray<Serializable | undefined> {}
 
 export type Unsubscribe = () => void;
 export type Listener<T extends Serializable> = (
