@@ -1,6 +1,6 @@
 {
   "name": "expo-use-memory-value",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Expo integration for stored memory values",
   "main": "index.cjs.js",
   "types": "index.d.ts",
