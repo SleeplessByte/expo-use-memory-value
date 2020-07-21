@@ -1,13 +1,17 @@
-import SecureStorage from 'expo-secure-store';
+import {
+  getItemAsync as nativeGetItemAsync,
+  setItemAsync as nativeSetItemAsync,
+  deleteItemAsync as nativeDeleteItemAsync,
+} from 'expo-secure-store';
 
 export const getItemAsync = (key: string) =>
-  SecureStorage.getItemAsync(key).then((value) =>
-    value ? JSON.parse(value) : value
-  );
+  nativeGetItemAsync(key).then((value) => (value ? JSON.parse(value) : value));
 
 export const setItemAsync = (key: string, value: unknown) => {
   const storable = JSON.stringify(value);
-  return SecureStorage.setItemAsync(key, storable);
+  return nativeSetItemAsync(key, storable);
 };
 
-export const deleteItemAsync = SecureStorage.deleteItemAsync;
+export const deleteItemAsync = (key: string) => {
+  return nativeDeleteItemAsync(key);
+};

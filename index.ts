@@ -124,7 +124,7 @@ export class SecureStoredMemoryValue<T extends Serializable>
     this.storageKey = storageKey;
 
     if (hydrate) {
-      this.read();
+      this.hydrate();
     }
   }
 
@@ -156,7 +156,7 @@ export class SecureStoredMemoryValue<T extends Serializable>
     return this.value.emit(value, false, false);
   }
 
-  private async read() {
+  async hydrate() {
     return getSecureItemAsync(this.storageKey).then(
       (value: any) => {
         if (value) {
@@ -198,7 +198,7 @@ export class StoredMemoryValue<T extends Serializable>
     this.storageKey = storageKey;
 
     if (hydrate) {
-      this.read();
+      this.hydrate();
     }
   }
 
@@ -230,7 +230,7 @@ export class StoredMemoryValue<T extends Serializable>
     return this.value.emit(value, false, false);
   }
 
-  private async read() {
+  async hydrate() {
     return getItemAsync(this.storageKey).then(
       (value: any) => {
         if (value) {
