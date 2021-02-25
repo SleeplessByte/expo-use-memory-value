@@ -7,7 +7,7 @@ Compatible with SDK 38.
 ## Installation
 
 ```bash
-yarn add use-memory-value
+yarn add expo-use-memory-value
 ```
 
 It has the following peerDependencies, along with `react` and `react-native` / `react-native-web`:
