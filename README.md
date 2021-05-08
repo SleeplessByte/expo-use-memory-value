@@ -2,7 +2,9 @@
 
 Hooks for global state in memory and local storage (platform dependent). It's like context, but only one state per value; allows you to subscribe and update values from far away.
 
-Compatible with SDK 38.
+Tested against SDK 40.
+
+If you're looking for non expo implementation: [`use-memory-value`](https://github.com/SleeplessByte/use-memory-value).
 
 ## Installation
 
