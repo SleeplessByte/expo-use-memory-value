@@ -111,7 +111,8 @@ export class MemoryValue<T extends Serializable> implements AnyMemoryValue<T> {
 }
 
 export class SecureStoredMemoryValue<T extends Serializable>
-  implements AnyMemoryValue<T | NoValue> {
+  implements AnyMemoryValue<T | NoValue>
+{
   private value: MemoryValue<T | NoValue>;
 
   constructor(
@@ -185,7 +186,8 @@ export class SecureStoredMemoryValue<T extends Serializable>
 }
 
 export class StoredMemoryValue<T extends Serializable>
-  implements AnyMemoryValue<T | NoValue> {
+  implements AnyMemoryValue<T | NoValue>
+{
   private value: MemoryValue<T | NoValue>;
 
   constructor(

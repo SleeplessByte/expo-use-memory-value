@@ -2,7 +2,7 @@
 
 Hooks for global state in memory and local storage (platform dependent). It's like context, but only one state per value; allows you to subscribe and update values from far away.
 
-Tested against SDK 40.
+Tested against SDK 44.
 
 If you're looking for non expo implementation: [`use-memory-value`](https://github.com/SleeplessByte/use-memory-value).
 
@@ -15,7 +15,7 @@ yarn add expo-use-memory-value
 It has the following peerDependencies, along with `react` and `react-native` / `react-native-web`:
 
 ```bash
-yarn add @react-native-community/async-storage expo-secure-store localforage react-fast-compare
+yarn expo add @react-native-async-storage/async-storage expo-secure-store localforage
 # assumes already installed:
 # - react
 # - react-native
@@ -25,7 +25,7 @@ yarn add @react-native-community/async-storage expo-secure-store localforage rea
 If you _only_ target the web, you can use the following, and ignore the warnings about `async-storage` and `expo-secure-store`:
 
 ```bash
-yarn add localforage react-fast-compare
+yarn add localforage
 # assumes already installed:
 # - react
 # - react-native-web
@@ -34,7 +34,7 @@ yarn add localforage react-fast-compare
 If you _do not_ target the web, you can use the following, and ignore the warnings about `localforage`:
 
 ```bash
-yarn add @react-native-community/async-storage expo-secure-store react-fast-compare
+yarn expo add @react-native-async-storage/async-storage expo-secure-store
 # assumes already installed:
 # - react
 # - react-native
@@ -45,7 +45,7 @@ yarn add @react-native-community/async-storage expo-secure-store react-fast-comp
 Start by creating a new `MemoryValue` or `StoredMemoryValue`. You can declare this in any file, make sure it's exported and importable from all the files you want to use the value.
 
 ```typescript
-import { MemoryValue } from 'use-memory-value';
+import { value MemoryValue } from 'use-memory-value';
 
 type State = {
   foo: number;
@@ -64,9 +64,12 @@ export const MY_STATE = new MemoryValue<State>(INITIAL_STATE);
 Then, where you want to use the value, import the `MemoryValue` and `useMemoryValue`:
 
 ```tsx
-import { useMemoryValue, useMutableMemoryValue } from 'use-memory-value';
+import {
+  value useMemoryValue,
+  value useMutableMemoryValue,
+} from 'use-memory-value';
 
-import { MY_STATE } from '../path/to/state';
+import { value MY_STATE } from '../path/to/state';
 
 function ReadOnlyBar() {
   const state = useMemoryValue(MY_STATE);
@@ -122,5 +125,5 @@ Note: There are limitations to storage size.
 For the web it uses `localforage` under the hood. You can set the instance yourself by importing
 
 ```typescript
-import { setLocalForageInstance } from 'expo-use-memory-value/storage.web';
+import { value setLocalForageInstance } from 'expo-use-memory-value/storage.web';
 ```

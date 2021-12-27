@@ -1,0 +1,13 @@
+node_modules
+
+index.*
+!index.ts
+!index.test.tsx
+secure.*
+!secure.ts
+!secure.web.ts
+storage.*
+!storage.ts
+!storage.web.ts
+
+tsconfig.tsbuildinfo
