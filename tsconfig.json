@@ -10,9 +10,9 @@
   },
   "include": [
     "index.ts",
+    "secure.native.ts",
     "secure.ts",
-    "secure.web.ts",
     "storage.ts",
-    "storage.web.ts"
+    "storage.native.ts"
   ]
 }

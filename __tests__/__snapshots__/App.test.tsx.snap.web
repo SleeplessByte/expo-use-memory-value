@@ -1,0 +1,253 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<App /> with useGlobalValue(MemoryValue) can be updated from outside 1`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    {"answer":42}
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(MemoryValue) can be updated from outside 2`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    "I do know!"
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(MemoryValue) renders and updates 1`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    {"answer":42}
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(MemoryValue) renders and updates 2`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    "How would I know"
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(SecureStoredMemoryValue) can be updated from outside 1`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    {"secure":"absolutely"}
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(SecureStoredMemoryValue) can be updated from outside 2`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    "I do know!"
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(SecureStoredMemoryValue) renders and updates 1`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    {"secure":"absolutely"}
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(SecureStoredMemoryValue) renders and updates 2`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    "How would I know"
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(StoredMemoryValue) can be updated from outside 1`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    {"doctor":"who"}
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(StoredMemoryValue) can be updated from outside 2`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    "I do know!"
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(StoredMemoryValue) renders and updates 1`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    {"doctor":"who"}
+  </div>
+</div>
+`;
+
+exports[`<App /> with useGlobalValue(StoredMemoryValue) renders and updates 2`] = `
+<div
+  className="css-view-175oi2r r-cursor-1loqt21 r-touchAction-1otgn73"
+  data-testid="button"
+  dir={null}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onContextMenu={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="css-text-146c3p1"
+    dir="auto"
+  >
+    "How would I know"
+  </div>
+</div>
+`;

@@ -61,7 +61,9 @@ export type EmitEvent<T extends Serializable = Serializable> = Readonly<{
 export interface AnyMemoryValue<T extends Serializable> {
   getSnapshot(): AnyValue<T>;
   subscribe(listener: Listener<T>): Unsubscribe;
-  emit(nextValue: AnyValue<T>): AnyValue<T>;
+  emit(
+    nextValue: AnyValue<T> | ((prev: AnyValue<T>) => AnyValue<T>)
+  ): AnyValue<T>;
 }
 
 export class MemoryValue<T extends Serializable> implements AnyMemoryValue<T> {
@@ -71,6 +73,10 @@ export class MemoryValue<T extends Serializable> implements AnyMemoryValue<T> {
   constructor(initial?: Readonly<T>) {
     this.value = initial;
     this.key = `memory-value-${Math.random().toString(36)}`;
+
+    this.getSnapshot = this.getSnapshot.bind(this);
+    this.subscribe = this.subscribe.bind(this);
+    this.emit = this.emit.bind(this);
   }
 
   getSnapshot(): AnyValue<T> {
@@ -105,7 +111,7 @@ export class MemoryValue<T extends Serializable> implements AnyMemoryValue<T> {
       key: this.key,
       value: nextValue,
       oldValue: this.value,
-    } satisfies EmitEvent<T>);
+    } as EmitEvent<T>);
 
     return nextValue;
   }
@@ -114,16 +120,21 @@ export class MemoryValue<T extends Serializable> implements AnyMemoryValue<T> {
 export class SecureStoredMemoryValue<T extends Serializable>
   implements AnyMemoryValue<T | NoValue>
 {
-  private value: MemoryValue<T | NoValue>;
+  private memoryValue: MemoryValue<T | NoValue>;
 
   constructor(
     private storageKey: string,
     initial?: Readonly<T>
   ) {
-    this.value = new MemoryValue<T | NoValue>(initial);
+    this.memoryValue = new MemoryValue<T | NoValue>(initial);
+
+    this.getSnapshot = this.getSnapshot.bind(this);
+    this.subscribe = this.subscribe.bind(this);
+    this.emit = this.emit.bind(this);
+    this.write = this.write.bind(this);
 
     // Hydrate from storage
-    this.hydrate()
+    this.hydrate(initial)
       .catch(() => {})
       .then(() => {
         // Subscribe to updates after hydration
@@ -132,11 +143,11 @@ export class SecureStoredMemoryValue<T extends Serializable>
   }
 
   getSnapshot(): AnyValue<T | NoValue> {
-    return this.value.getSnapshot();
+    return this.memoryValue.getSnapshot();
   }
 
   subscribe(listener: Listener<T | NoValue>) {
-    return this.value.subscribe(listener);
+    return this.memoryValue.subscribe(listener);
   }
 
   emit(
@@ -155,16 +166,21 @@ export class SecureStoredMemoryValue<T extends Serializable>
     }
 
     this.write(nextValue).catch(() => {});
-    return this.value.emit(nextValue);
+    return this.memoryValue.emit(nextValue);
   }
 
-  async hydrate() {
+  async hydrate(initial?: Readonly<T>) {
     const value = await getSecureItemAsync(this.storageKey);
 
     if (value === undefined || value === null) {
-      this.value.emit(null);
+      if (initial === undefined) {
+        this.memoryValue.emit(null);
+      } else {
+        this.memoryValue.emit(initial);
+        this.write(initial);
+      }
     } else {
-      this.value.emit(value as T);
+      this.memoryValue.emit(value as T);
     }
   }
 
@@ -180,16 +196,21 @@ export class SecureStoredMemoryValue<T extends Serializable>
 export class StoredMemoryValue<T extends Serializable>
   implements AnyMemoryValue<T | NoValue>
 {
-  private value: MemoryValue<T | NoValue>;
+  private memoryValue: MemoryValue<T | NoValue>;
 
   constructor(
     private storageKey: string,
     initial?: Readonly<T>
   ) {
-    this.value = new MemoryValue<T | NoValue>(initial);
+    this.memoryValue = new MemoryValue<T | NoValue>(initial);
+
+    this.getSnapshot = this.getSnapshot.bind(this);
+    this.subscribe = this.subscribe.bind(this);
+    this.emit = this.emit.bind(this);
+    this.write = this.write.bind(this);
 
     // Hydrate from storage
-    this.hydrate()
+    this.hydrate(initial)
       .catch(() => {})
       .then(() => {
         // Subscribe to updates after hydration
@@ -198,11 +219,11 @@ export class StoredMemoryValue<T extends Serializable>
   }
 
   getSnapshot(): AnyValue<T | NoValue> {
-    return this.value.getSnapshot();
+    return this.memoryValue.getSnapshot();
   }
 
   subscribe(listener: Listener<T | NoValue>) {
-    return this.value.subscribe(listener);
+    return this.memoryValue.subscribe(listener);
   }
 
   emit(
@@ -221,16 +242,21 @@ export class StoredMemoryValue<T extends Serializable>
     }
 
     this.write(nextValue).catch(() => {});
-    return this.value.emit(nextValue);
+    return this.memoryValue.emit(nextValue);
   }
 
-  async hydrate() {
+  async hydrate(initial?: Readonly<T>) {
     const value = await getItemAsync(this.storageKey);
 
     if (value === undefined || value === null) {
-      this.value.emit(null);
+      if (initial === undefined) {
+        this.memoryValue.emit(null);
+      } else {
+        this.memoryValue.emit(initial);
+        this.write(initial);
+      }
     } else {
-      this.value.emit(value as T);
+      this.memoryValue.emit(value as T);
     }
   }
 
@@ -243,25 +269,19 @@ export class StoredMemoryValue<T extends Serializable>
   }
 }
 
-export function useGlobalValue<T extends Serializable = Serializable>(
-  value: AnyMemoryValue<T | NoValue>
-): [
-  AnyValue<T | NoValue>,
-  Dispatch<SetStateAction<T | NoValue | UndeterminedValue>>,
-] {
+export function useGlobalValue<T extends Serializable>(
+  value: AnyMemoryValue<T>
+): [AnyValue<T>, Dispatch<SetStateAction<T | UndeterminedValue>>] {
   const snapshot = useSyncExternalStore(value.subscribe, value.getSnapshot);
   return [
     snapshot,
-    value.emit as Dispatch<SetStateAction<T | NoValue | UndeterminedValue>>,
+    value.emit as Dispatch<SetStateAction<T | UndeterminedValue>>,
   ];
 }
 
 export function useGlobalValueAsync<T extends Serializable = Serializable>(
-  value: AnyMemoryValue<T | NoValue>
-): [
-  [boolean, AnyValue<T | NoValue>],
-  Dispatch<SetStateAction<T | NoValue | UndeterminedValue>>,
-] {
+  value: AnyMemoryValue<T>
+): [[boolean, AnyValue<T>], Dispatch<SetStateAction<T | UndeterminedValue>>] {
   const [state, setState] = useGlobalValue<T>(value);
   return [[state === undefined, state], setState];
 }

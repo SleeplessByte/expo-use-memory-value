@@ -1,15 +1,19 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import localForage from 'localforage';
+
+const globals: { current: LocalForage } = { current: localForage };
+
+export function setLocalForageInstance(instance: LocalForage) {
+  globals.current = instance;
+}
 
 export async function getItemAsync(key: string): Promise<unknown> {
-  const value = await AsyncStorage.getItem(key);
-  return value ? JSON.parse(value) : value;
+  return await globals.current.getItem(key);
 }
 
 export async function setItemAsync<T>(key: string, value: T) {
-  const storable = JSON.stringify(value);
-  return AsyncStorage.setItem(key, storable);
+  return globals.current.setItem(key, value);
 }
 
 export async function deleteItemAsync(key: string) {
-  return AsyncStorage.removeItem(key);
+  return globals.current.removeItem(key);
 }

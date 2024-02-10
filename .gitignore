@@ -5,10 +5,10 @@ index.*
 !index.test.tsx
 secure.*
 !secure.ts
-!secure.web.ts
+!secure.native.ts
 storage.*
 !storage.ts
-!storage.web.ts
+!storage.native.ts
 
 tsconfig.tsbuildinfo
 
