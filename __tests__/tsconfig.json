@@ -2,7 +2,9 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "types": ["react-native", "jest"],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "jsx": "react-native"
   },
   "include": ["./*.test.tsx"]
 }
