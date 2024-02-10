@@ -2,7 +2,15 @@
   "name": "expo-use-memory-value",
   "version": "6.0.0",
   "description": "Expo integration for stored memory values",
-  "main": "index.cjs.js",
+  "source": "index.ts",
+  "type": "module",
+  "main": "index.cjs",
+  "module": "index.js",
+  "unpkg": "index.umd.js",
+  "exports": {
+    "require": "./index.cjs",
+    "default": "./index.modern.js"
+  },
   "types": "index.d.ts",
   "author": "Derk-Jan Karrenbeld <derk-jan+github@karrenbeld.info>",
   "license": "MIT",
@@ -11,10 +19,9 @@
     "url": "https://github.com/SleeplessByte/expo-use-memory-value.git"
   },
   "scripts": {
-    "build": "yarn build:main && yarn build:dts",
-    "build:main": "yarn tsc --module commonjs && move .\\index.js .\\index.cjs.js",
-    "build:dts": "yarn tsc --declaration --declarationMap --emitDeclarationOnly",
-    "prepublish": "yarn build"
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "prepack": "yarn build"
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "1.21.0",
@@ -24,6 +31,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@react-native-async-storage/async-storage": "1.21.0",
+    "@tsconfig/react-native": "^3.0.3",
     "@types/react": "~18.2.55",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
@@ -33,6 +41,7 @@
     "expo": "^50.0.6",
     "expo-secure-store": "~12.8.1",
     "localforage": "^1.10.0",
+    "microbundle": "^0.15.1",
     "prettier": "^3.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -41,9 +50,7 @@
     "typescript": "~5.3.3"
   },
   "files": [
-    "index.*",
-    "storage.*",
-    "secure.*"
+    "index.*"
   ],
   "dependencies": {
     "mitt": "^3.0.1",
