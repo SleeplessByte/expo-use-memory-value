@@ -6,7 +6,14 @@ export function setLocalForageInstance(instance: LocalForage) {
   globals.current = instance;
 }
 
-export const getItemAsync = (key: string) => globals.current.getItem(key);
-export const setItemAsync = (key: string, value: unknown) =>
-  globals.current.setItem(key, value);
-export const deleteItemAsync = (key: string) => globals.current.removeItem(key);
+export async function getItemAsync(key: string): Promise<unknown> {
+  return await globals.current.getItem(key);
+}
+
+export async function setItemAsync<T>(key: string, value: T) {
+  return globals.current.setItem(key, value);
+}
+
+export async function deleteItemAsync(key: string) {
+  return globals.current.removeItem(key);
+}

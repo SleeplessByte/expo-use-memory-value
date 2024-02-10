@@ -1,12 +1,11 @@
 {
   "name": "expo-use-memory-value",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Expo integration for stored memory values",
   "main": "index.cjs.js",
   "types": "index.d.ts",
   "author": "Derk-Jan Karrenbeld <derk-jan+github@karrenbeld.info>",
   "license": "MIT",
-  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/SleeplessByte/expo-use-memory-value.git"
@@ -18,30 +17,28 @@
     "prepublish": "yarn build"
   },
   "peerDependencies": {
-    "@react-native-async-storage/async-storage": ">=1.15.14",
-    "expo-secure-store": ">=11.1.0",
+    "@react-native-async-storage/async-storage": "1.21.0",
+    "expo-secure-store": "~12.8.1",
     "localforage": "^1.10.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.5",
-    "@react-native-async-storage/async-storage": "~1.15.14",
-    "@types/react": "~17.0.38",
-    "@types/react-native": "~0.66.9",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "babel-preset-expo": "9.0.2",
-    "eslint": "^7.32.0",
-    "eslint-config-universe": "^9.0.0",
-    "expo": "^44.0.1",
-    "expo-cli": "^5.0.3",
-    "expo-secure-store": "~11.1.0",
+    "@babel/core": "^7.23.9",
+    "@react-native-async-storage/async-storage": "1.21.0",
+    "@types/react": "~18.2.55",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "babel-preset-expo": "10.0.1",
+    "eslint": "^8.56.0",
+    "eslint-config-universe": "^12.0.0",
+    "expo": "^50.0.6",
+    "expo-secure-store": "~12.8.1",
     "localforage": "^1.10.0",
-    "prettier": "^2.5.1",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
-    "react-native": "0.64.3",
-    "react-native-web": "0.17.1",
-    "typescript": "~4.5.4"
+    "prettier": "^3.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.73.2",
+    "react-native-web": "~0.19.10",
+    "typescript": "~5.3.3"
   },
   "files": [
     "index.*",
@@ -49,6 +46,7 @@
     "secure.*"
   ],
   "dependencies": {
-    "react-fast-compare": "^3.2.0"
+    "mitt": "^3.0.1",
+    "react-fast-compare": "^3.2.2"
   }
 }

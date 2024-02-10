@@ -1,10 +1,6 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useState,
-  useLayoutEffect,
-} from 'react';
+import mitt from 'mitt';
+import type { Dispatch, SetStateAction } from 'react';
+import { useSyncExternalStore } from 'react';
 import isEqual from 'react-fast-compare';
 
 import {
@@ -13,6 +9,8 @@ import {
   setItemAsync as setSecureItemAsync,
 } from './secure';
 import { deleteItemAsync, getItemAsync, setItemAsync } from './storage';
+
+const emitter = mitt<{ emit: EmitEvent }>();
 
 let warningDisabled = false;
 export function disableWarnings() {
@@ -54,59 +52,62 @@ export type Update<T extends Serializable> = Dispatch<
   SetStateAction<AnyValue<T> | undefined>
 >;
 export type AnyValue<T extends Serializable> = T | UndeterminedValue;
+export type EmitEvent<T extends Serializable = Serializable> = Readonly<{
+  key: string;
+  value: Readonly<AnyValue<T>>;
+  oldValue: Readonly<AnyValue<T>>;
+}>;
 
 export interface AnyMemoryValue<T extends Serializable> {
-  current: AnyValue<T>;
-  subscribe(listener: Listener<T>, emit?: boolean): Unsubscribe;
-  unsubscribe(listener: Listener<T>): void;
-  emit(
-    value: AnyValue<T>,
-    store?: boolean,
-    newOnly?: boolean
-  ): Promise<AnyValue<T>>;
+  getSnapshot(): AnyValue<T>;
+  subscribe(listener: Listener<T>): Unsubscribe;
+  emit(nextValue: AnyValue<T>): AnyValue<T>;
 }
 
 export class MemoryValue<T extends Serializable> implements AnyMemoryValue<T> {
-  private listeners: Listener<T>[];
   private value: T | undefined;
+  private readonly key: string;
 
   constructor(initial?: Readonly<T>) {
-    this.listeners = [];
     this.value = initial;
+    this.key = `memory-value-${Math.random().toString(36)}`;
   }
 
-  get current(): T | undefined {
+  getSnapshot(): AnyValue<T> {
     return this.value;
   }
 
-  subscribe(listener: Listener<T>, emit: boolean = true): Unsubscribe {
-    if (this.value !== undefined && emit) {
-      listener(this.value);
-    }
+  subscribe(listener: Listener<T>): Unsubscribe {
+    const onEmit = (event: EmitEvent) => {
+      if (event.key === this.key) {
+        listener(event.value as Readonly<AnyValue<T>>);
+      }
+    };
 
-    this.listeners.push(listener);
-    return () => this.unsubscribe(listener);
+    emitter.on('emit', onEmit);
+    return () => {
+      emitter.off('emit', onEmit);
+    };
   }
 
-  unsubscribe(listener: Listener<T>) {
-    const index = this.listeners.indexOf(listener);
-    if (index >= 0) {
-      this.listeners.splice(index, 1);
-    }
-  }
-
-  async emit(
-    value: T | undefined,
-    _store: boolean = false,
-    newOnly: boolean = true
-  ) {
-    if (newOnly && isEqual(this.value, value)) {
-      return value;
+  emit(nextValue: AnyValue<T> | ((prev: AnyValue<T>) => AnyValue<T>)) {
+    if (typeof nextValue === 'function') {
+      nextValue = nextValue(this.value);
     }
 
-    this.value = value;
-    await Promise.all(this.listeners.map(async (listener) => listener(value)));
-    return value;
+    if (isEqual(this.value, nextValue)) {
+      return nextValue;
+    }
+
+    this.value = nextValue;
+
+    emitter.emit('emit', {
+      key: this.key,
+      value: nextValue,
+      oldValue: this.value,
+    } satisfies EmitEvent<T>);
+
+    return nextValue;
   }
 }
 
@@ -117,71 +118,62 @@ export class SecureStoredMemoryValue<T extends Serializable>
 
   constructor(
     private storageKey: string,
-    hydrate: boolean = true,
     initial?: Readonly<T>
   ) {
     this.value = new MemoryValue<T | NoValue>(initial);
 
-    this.storageKey = storageKey;
-
-    if (hydrate) {
-      this.hydrate();
-    }
+    // Hydrate from storage
+    this.hydrate()
+      .catch(() => {})
+      .then(() => {
+        // Subscribe to updates after hydration
+        this.subscribe(this.write);
+      });
   }
 
-  get current(): T | null | undefined {
-    return this.value.current;
+  getSnapshot(): AnyValue<T | NoValue> {
+    return this.value.getSnapshot();
   }
 
-  subscribe(listener: Listener<T | NoValue>, emit: boolean = true) {
-    return this.value.subscribe(listener, emit);
+  subscribe(listener: Listener<T | NoValue>) {
+    return this.value.subscribe(listener);
   }
 
-  unsubscribe(listener: Listener<T | NoValue>) {
-    return this.value.unsubscribe(listener);
-  }
-
-  async emit(
-    value: AnyValue<T> | NoValue,
-    store: boolean = true,
-    newOnly: boolean = true
+  emit(
+    nextValue:
+      | AnyValue<T | NoValue>
+      | ((prev: AnyValue<T | NoValue>) => AnyValue<T | NoValue>)
   ) {
-    if (newOnly && isEqual(value, this.current)) {
-      return value;
+    const prevValue = this.getSnapshot();
+
+    if (typeof nextValue === 'function') {
+      nextValue = nextValue(prevValue);
     }
 
-    if (store) {
-      await this.write(value);
+    if (isEqual(nextValue, prevValue)) {
+      return nextValue;
     }
 
-    return this.value.emit(value, false, false);
+    this.write(nextValue).catch(() => {});
+    return this.value.emit(nextValue);
   }
 
   async hydrate() {
-    return getSecureItemAsync(this.storageKey).then(
-      (value: any) => {
-        if (value) {
-          return this.emit(value, false);
-        } else {
-          return this.emit(null, false);
-        }
-      },
-      () => {
-        return this.value;
-      }
-    );
+    const value = await getSecureItemAsync(this.storageKey);
+
+    if (value === undefined || value === null) {
+      this.value.emit(null);
+    } else {
+      this.value.emit(value as T);
+    }
   }
 
   private async write(value: AnyValue<T> | NoValue) {
     if (value === undefined) {
-      return this.clear();
+      return deleteSecureItemAsync(this.storageKey).catch(warn);
     }
 
     return setSecureItemAsync(this.storageKey, value).catch(warn);
-  }
-
-  private async clear() {
-    return deleteSecureItemAsync(this.storageKey).catch(warn);
   }
 }
 
@@ -192,99 +184,84 @@ export class StoredMemoryValue<T extends Serializable>
 
   constructor(
     private storageKey: string,
-    hydrate: boolean = true,
     initial?: Readonly<T>
   ) {
     this.value = new MemoryValue<T | NoValue>(initial);
 
-    this.storageKey = storageKey;
-
-    if (hydrate) {
-      this.hydrate();
-    }
+    // Hydrate from storage
+    this.hydrate()
+      .catch(() => {})
+      .then(() => {
+        // Subscribe to updates after hydration
+        this.subscribe(this.write);
+      });
   }
 
-  get current(): T | null | undefined {
-    return this.value.current;
+  getSnapshot(): AnyValue<T | NoValue> {
+    return this.value.getSnapshot();
   }
 
-  subscribe(listener: Listener<T | NoValue>, emit: boolean = true) {
-    return this.value.subscribe(listener, emit);
+  subscribe(listener: Listener<T | NoValue>) {
+    return this.value.subscribe(listener);
   }
 
-  unsubscribe(listener: Listener<T | NoValue>) {
-    return this.value.unsubscribe(listener);
-  }
+  emit(
+    nextValue:
+      | AnyValue<T | NoValue>
+      | ((prev: AnyValue<T | NoValue>) => AnyValue<T | NoValue>)
+  ) {
+    const prevValue = this.getSnapshot();
 
-  async emit(
-    value: T | null | undefined,
-    store: boolean = true,
-    newOnly: boolean = true
-  ): Promise<AnyValue<T> | null> {
-    if (newOnly && isEqual(value, this.current)) {
-      return value;
-    }
-
-    if (store) {
-      await this.write(value);
+    if (typeof nextValue === 'function') {
+      nextValue = nextValue(prevValue);
     }
 
-    return this.value.emit(value, false, false);
+    if (isEqual(nextValue, prevValue)) {
+      return nextValue;
+    }
+
+    this.write(nextValue).catch(() => {});
+    return this.value.emit(nextValue);
   }
 
   async hydrate() {
-    return getItemAsync(this.storageKey).then(
-      (value: any) => {
-        if (value) {
-          return this.emit(value, false);
-        } else {
-          return this.emit(null, false);
-        }
-      },
-      () => {
-        return this.value;
-      }
-    );
+    const value = await getItemAsync(this.storageKey);
+
+    if (value === undefined || value === null) {
+      this.value.emit(null);
+    } else {
+      this.value.emit(value as T);
+    }
   }
 
-  private async write(value: T | null | undefined) {
+  private async write(value: AnyValue<T> | NoValue) {
     if (value === undefined) {
-      return this.clear();
+      return deleteItemAsync(this.storageKey).catch(warn);
     }
 
     return setItemAsync(this.storageKey, value).catch(warn);
   }
-
-  private async clear() {
-    return deleteItemAsync(this.storageKey).catch(warn);
-  }
 }
 
-export function useMemoryValue<T extends Serializable>(
-  value: AnyMemoryValue<T>
-): Readonly<AnyValue<T>> {
-  return useMutableMemoryValue(value)[0];
+export function useGlobalValue<T extends Serializable = Serializable>(
+  value: AnyMemoryValue<T | NoValue>
+): [
+  AnyValue<T | NoValue>,
+  Dispatch<SetStateAction<T | NoValue | UndeterminedValue>>,
+] {
+  const snapshot = useSyncExternalStore(value.subscribe, value.getSnapshot);
+  return [
+    snapshot,
+    value.emit as Dispatch<SetStateAction<T | NoValue | UndeterminedValue>>,
+  ];
 }
 
-export function useMutableMemoryValue<T extends Serializable>(
-  value: AnyMemoryValue<T>
-): [Readonly<AnyValue<T>>, Update<T>] {
-  const [state, setState] = useState<AnyValue<T>>(value.current);
-
-  const update = useCallback(
-    (nextValue: AnyValue<T> | ((prev: AnyValue<T>) => AnyValue<T>)) => {
-      if (nextValue instanceof Function || typeof nextValue === 'function') {
-        value.emit(nextValue(value.current));
-      } else {
-        value.emit(nextValue);
-      }
-    },
-    [value]
-  );
-
-  useLayoutEffect(() => {
-    return value.subscribe(setState);
-  }, [value, setState]);
-
-  return [state, update];
+export function useGlobalValueAsync<T extends Serializable = Serializable>(
+  value: AnyMemoryValue<T | NoValue>
+): [
+  [boolean, AnyValue<T | NoValue>],
+  Dispatch<SetStateAction<T | NoValue | UndeterminedValue>>,
+] {
+  const [state, setState] = useGlobalValue<T>(value);
+  return [[state === undefined, state], setState];
 }
