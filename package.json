@@ -1,9 +1,10 @@
 {
   "name": "expo-use-memory-value",
   "sideEffects": false,
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "Expo integration for stored memory values",
   "source": "index.ts",
+  "main": "index.ts",
   "type": "module",
   "types": "index.d.ts",
   "author": "Derk-Jan Karrenbeld <derk-jan+github@karrenbeld.info>",
