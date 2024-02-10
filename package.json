@@ -1,6 +1,7 @@
 {
   "name": "expo-use-memory-value",
-  "version": "6.0.0",
+  "sideEffects": false,
+  "version": "6.0.1",
   "description": "Expo integration for stored memory values",
   "source": "index.ts",
   "type": "module",
