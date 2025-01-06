@@ -1,7 +1,7 @@
 {
   "name": "expo-use-memory-value",
   "sideEffects": false,
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Expo integration for stored memory values",
   "source": "index.ts",
   "main": "index.ts",
